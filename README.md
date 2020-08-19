@@ -26,11 +26,18 @@ Accuracy scores ([0,1] scale) for the undefended model (standard training), and 
 ![transferability](images/transfer.png)
 
 # Paper (arXiv preprint)
-More detailed information about the experiments can be found in the paper:
-**ARXIV_LINK**
-Please cite us if you find the paper/source code useful.
-**CITATION ARXIV**
-
+More detailed information about the experiments can be found in the paper: https://arxiv.org/abs/2008.07685  
+Please cite us if you find the paper/source code useful.  
+```
+@misc{jati2020adversarial,
+    title={Adversarial Attack and Defense Strategies for Deep Speaker Recognition Systems},
+    author={Arindam Jati and Chin-Cheng Hsu and Monisankha Pal and Raghuveer Peri and Wael AbdAlmageed and Shrikanth Narayanan},
+    year={2020},
+    eprint={2008.07685},
+    archivePrefix={arXiv},
+    primaryClass={eess.AS}
+}
+```
 
 # Installation
 Create your virtual env, and then install the dependencies.

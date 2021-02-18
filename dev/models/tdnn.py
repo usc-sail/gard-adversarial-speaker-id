@@ -1,66 +1,61 @@
 import torch
-import torch.nn as nn 
+import torch.nn as nn
 from dev.transforms import Preprocessor
 import torch.nn.functional as F
 
-
 class TDNN(nn.Module):
-
     def __init__(self, num_classes):
         super(TDNN, self).__init__()
-        
-        dropout = 0.0
 
         self.prep = Preprocessor()
-        
+
+        num_filters = 512
+        stats_dim = 1500
+        embed_dim = 512
+
         self.cnn_layers = nn.Sequential(
-            nn.Conv1d(32, 512, kernel_size=5, dilation=1),
-            nn.BatchNorm1d(512),
-            nn.Dropout(p=dropout),
+            # input normalization
+            nn.BatchNorm1d(32),
 
-            nn.Conv1d(512, 512, kernel_size=5, dilation=2),
-            nn.BatchNorm1d(512),
-            nn.Dropout(p=dropout),
+            nn.Conv1d(32, num_filters, kernel_size=5, dilation=1),
+            nn.BatchNorm1d(num_filters),
+            nn.ReLU(),
 
-            nn.Conv1d(512, 512, kernel_size=7, dilation=3),
-            nn.BatchNorm1d(512),
-            nn.Dropout(p=dropout),
+            nn.Conv1d(num_filters, num_filters, kernel_size=5, dilation=2),
+            nn.BatchNorm1d(num_filters),
+            nn.ReLU(),
 
-            nn.Conv1d(512, 512, kernel_size=1, dilation=1),
-            nn.BatchNorm1d(512),
-            nn.Dropout(p=dropout),
+            nn.Conv1d(num_filters, num_filters, kernel_size=7, dilation=3),
+            nn.BatchNorm1d(num_filters),
+            nn.ReLU(),
 
-            nn.Conv1d(512, 1500, kernel_size=1, dilation=1),
-            nn.BatchNorm1d(1500),
-            nn.Dropout(p=dropout)
+            nn.Conv1d(num_filters, num_filters, kernel_size=1, dilation=1),
+            nn.BatchNorm1d(num_filters),
+            nn.ReLU(),
+
+            nn.Conv1d(num_filters, stats_dim, kernel_size=1, dilation=1),
+            nn.BatchNorm1d(stats_dim),
+            nn.ReLU(),
         )
 
-        self.fc1 = nn.Linear(3000,512)
-        self.batchnorm_fc1 = nn.BatchNorm1d(512)
-        self.dropout_fc1 = nn.Dropout(p=dropout)
+        self.fc1 = nn.Linear(stats_dim*2, embed_dim)
+        self.batchnorm_fc1 = nn.BatchNorm1d(embed_dim)
 
-        self.fc2 = nn.Linear(512,512)
-        self.batchnorm_fc2 = nn.BatchNorm1d(512)
-        self.dropout_fc2 = nn.Dropout(p=dropout)
+        self.fc2 = nn.Linear(embed_dim,embed_dim)
+        self.batchnorm_fc2 = nn.BatchNorm1d(embed_dim)
 
-        self.fc3 = nn.Linear(512,num_classes)
+        self.fc3 = nn.Linear(embed_dim,num_classes)
 
     def encode(self, x):
         x = self.prep(x.squeeze(1))
-
         x = self.cnn_layers(x)
-
-        #if self.training:
-        #    #this is for stability purpose only
-        #    x += 0.001 * torch.rand_like(x)
-
         stats = torch.cat((x.mean(dim=2), x.std(dim=2)), dim=1)
-        x = self.dropout_fc1(self.batchnorm_fc1(F.relu(self.fc1(stats))))
-        x = self.fc2(x)
+        x = self.fc1(stats) # "segment6" in x-vector paper
         return x
-    
+
     def predict_from_embeddings(self, x):
-        x = self.dropout_fc2(self.batchnorm_fc2(F.relu(x)))
+        x = F.relu(self.batchnorm_fc1(x))
+        x = F.relu(self.batchnorm_fc2(self.fc2(x))) # "segment7 in x-vector paper"
         x = self.fc3(x)
         return x
 
@@ -74,4 +69,7 @@ class TDNN(nn.Module):
         x = self.encode(x)
         x = self.predict_from_embeddings(x)
         return x
+
+
+
 

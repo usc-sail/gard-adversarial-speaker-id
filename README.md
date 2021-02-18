@@ -25,7 +25,24 @@ Accuracy scores ([0,1] scale) for the undefended model (standard training), and 
 ### Transferability
 ![transferability](images/transfer.png)
 
-# Paper (arXiv preprint)
+# Paper 
+### Published on [Elsevier Computer, Speech and Language](https://www.sciencedirect.com/journal/computer-speech-and-language)
+Link: https://www.sciencedirect.com/science/article/pii/S0885230821000061
+```
+@article{JATI2021101199,
+title = {Adversarial attack and defense strategies for deep speaker recognition systems},
+journal = {Computer Speech & Language},
+volume = {68},
+pages = {101199},
+year = {2021},
+issn = {0885-2308},
+doi = {https://doi.org/10.1016/j.csl.2021.101199},
+url = {https://www.sciencedirect.com/science/article/pii/S0885230821000061},
+author = {Arindam Jati and Chin-Cheng Hsu and Monisankha Pal and Raghuveer Peri and Wael AbdAlmageed and Shrikanth Narayanan},
+}
+```
+
+### arXiv preprint (does not have the latest experiments on speaker verification)
 More detailed information about the experiments can be found in the paper: https://arxiv.org/abs/2008.07685  
 Please cite us if you find the paper/source code useful.  
 ```
